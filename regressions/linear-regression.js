@@ -34,6 +34,21 @@ class LinearRegression {
       this.gradientDescent();
     }
   }
+
+  test(testFeatures, testLabels) {
+    testFeatures = tf.tensor(testFeatures);
+    testLabels = tf.tensor(testLabels);
+
+    testFeatures = tf.ones([testFeatures.shape[0], 1]).concat(testFeatures, 1);
+
+    const prodictions = testFeatures.matMul(this.weights);
+
+    const res = testLabels.sub(prodictions).pow(2).sum().arraySync();
+
+    const tot = testLabels.sub(testLabels.mean()).pow(2).sum().arraySync();
+
+    return 1 - res / tot;
+  }
 }
 
 module.exports = LinearRegression;
