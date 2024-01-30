@@ -46,37 +46,26 @@ class LinearRegression {
 
   processFeatures(features) {
     features = tf.tensor(features);
+
+    if (this.mean && this.variance) {
+      features = features.sub(this.mean).div(this.variance.pow(0.5));
+    } else {
+      features = this.standardize(features);
+    }
+
     features = tf.ones([features.shape[0], 1]).concat(features, 1);
+
     return features;
+  }
+
+  standardize(features) {
+    const { mean, variance } = tf.moments(features, 0);
+
+    this.mean = mean;
+    this.variance = variance;
+
+    return features.sub(mean).div(variance.pow(0.5));
   }
 }
 
 module.exports = LinearRegression;
-
-/*
-This is the old version:
-gradientDescent() {
-    const currentGuessesForMPG = this.features.map((row) => {
-      return this.m * row[0] + this.b;
-    });
-
-    const bSlope =
-      (_.sum(
-        currentGuessesForMPG.map((guess, i) => guess - this.labels[i][0])
-      ) *
-        2) /
-      this.features.length;
-
-    const mSlope =
-      (_.sum(
-        currentGuessesForMPG.map(
-          (guess, i) => -1 * this.features[i][0] * (this.labels[i][0] - guess)
-        )
-      ) *
-        2) /
-      this.features.length;
-
-    this.m = this.m - mSlope * this.options.learningRate;
-    this.b = this.b - bSlope * this.options.learningRate;
-  }
-*/
